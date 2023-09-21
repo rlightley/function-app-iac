@@ -35,9 +35,13 @@ resource "azurerm_windows_function_app" "fa" {
   storage_account_access_key = azurerm_storage_account.sa.primary_access_key
   service_plan_id            = azurerm_service_plan.asp.id
 
+  site_config {
+    minimum_tls_version = "1.2"
+  }
+
   app_settings = {
-    "APPINSIGHTS_INSTRUMENTATIONKEY"             = data.azurerm_application_insights.ai.instrumentation_key
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"      = data.azurerm_application_insights.ai.connection_string
+    "APPINSIGHTS_INSTRUMENTATIONKEY"             = azurerm_application_insights.ai.instrumentation_key
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"      = azurerm_application_insights.ai.connection_string
     "ASPNETCORE_ENVIRONMENT"                     = var.environment
     "ApplicationInsightsAgent_EXTENSION_VERSION" = "~2"
   }
@@ -45,7 +49,7 @@ resource "azurerm_windows_function_app" "fa" {
   connection_string {
     name  = "AppConfig"
     type  = "Custom"
-    value = data.azurerm_app_configuration.appconf.primary_read_key.0.connection_string
+    value = azurerm_app_configuration.appconf.primary_read_key.0.connection_string
   }
 
   tags = local.default_tags
